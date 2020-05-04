@@ -1,7 +1,9 @@
 package com.example.popularmoviesapp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -20,11 +22,14 @@ public class DetailActivity extends AppCompatActivity {
     private boolean hasConnection;
     private AppDatabase mDb;
     private Movie mMovie;
+    private boolean mChangeStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
+        mChangeStatus = false;
 
         mDb = AppDatabase.getInstance(getApplicationContext());
 
@@ -63,20 +68,54 @@ public class DetailActivity extends AppCompatActivity {
                 populateReviews(mMovie.getId());
 
                 final ImageView imageView = findViewById(R.id.ib_star);
+                if(mMovie.isFavourite()){
+                    imageView.setColorFilter(getColor(R.color.yellow));
+                }
+                else {
+                    imageView.setColorFilter(getColor(R.color.white));
+                }
                 imageView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         ImageView imageView = findViewById(R.id.ib_star);
-                        imageView.setColorFilter(getColor(R.color.yellow));
                         // we check if the movie exists already in the DB
-                        Movie result = mDb.movieDao().getMovie(mMovie.getId());
-                        if(result==null){
-                            mDb.movieDao().insertMovie(mMovie);
+                        //
+                        //TODO we should create a fragment instead, to share the viewmodel between the two screens
+                        //at least create new thread
+                        //Detail Activity should not access the database directly
+                        if(mMovie.isFavourite()){
+                            mChangeStatus = !mChangeStatus;
+                            mMovie.setIsFavourite(false);
+                            imageView.setColorFilter(getColor(R.color.white));
+                        }
+                        else {
+                            mChangeStatus = !mChangeStatus;
+                            mMovie.setIsFavourite(true);
+                            imageView.setColorFilter(getColor(R.color.yellow));
                         }
                     }
                 });
             }
         }
+        if(savedInstanceState!=null) {
+            if (savedInstanceState.containsKey("mChangeStatus")) {
+                mChangeStatus = savedInstanceState.getBoolean("mChangeStatus");
+            }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putBoolean("mChangeStatus", mChangeStatus);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void finish() {
+        Intent intent = new Intent();
+        intent.putExtra("change_favourite_status", mChangeStatus?"true":"false");
+        setResult(RESULT_OK, intent);
+        super.finish();
     }
 
     public void populateTrailers(int movieId){
@@ -132,9 +171,5 @@ public class DetailActivity extends AppCompatActivity {
             }
         }
     }
-
-
-
-
 
 }

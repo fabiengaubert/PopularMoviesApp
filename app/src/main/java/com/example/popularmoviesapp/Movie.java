@@ -5,13 +5,14 @@ import android.os.Parcelable;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "movie")
 public class Movie implements Parcelable {
 
     @PrimaryKey
-    //TODO should we autogerenate the ID (autoGenerate = true)
+    //TODO should we autogerenate the ID? (autoGenerate = true)
     private int mId;
     @ColumnInfo(name="title")
     private String mTitle;
@@ -23,6 +24,8 @@ public class Movie implements Parcelable {
     private String mPosterPath;
     @ColumnInfo(name="vote_average")
     private double mVoteAverage;
+    @Ignore
+    private boolean mIsFavourite;
 
     public Movie(int id, String title, String date, String overview, String posterPath, double voteAverage) {
         mId = id;
@@ -40,6 +43,7 @@ public class Movie implements Parcelable {
         mOverview = in.readString();
         mPosterPath = in.readString();
         mVoteAverage = in.readDouble();
+        mIsFavourite = in.readBoolean();
     }
 
     @Override
@@ -50,6 +54,7 @@ public class Movie implements Parcelable {
         dest.writeString(mOverview);
         dest.writeString(mPosterPath);
         dest.writeDouble(mVoteAverage);
+        dest.writeBoolean(mIsFavourite);
     }
 
     @Override
@@ -92,4 +97,8 @@ public class Movie implements Parcelable {
     public double getVoteAverage() {
         return mVoteAverage;
     }
+
+    public boolean isFavourite() { return mIsFavourite; }
+
+    public void setIsFavourite(boolean mIsFavourite) { this.mIsFavourite = mIsFavourite; }
 }

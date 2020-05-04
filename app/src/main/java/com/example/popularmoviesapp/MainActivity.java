@@ -1,12 +1,15 @@
 package com.example.popularmoviesapp;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Menu;
@@ -15,10 +18,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.Toast;
-
-import com.example.popularmoviesapp.utilities.NetworkUtils;
-import com.example.popularmoviesapp.utilities.TheMovieDbJsonUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,18 +30,23 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Ite
     private static final int POPULAR_POSITION = 0;
     private static final int TOP_VOTE_POSITION = 1;
     private static final int FAVOURITE_POSITION = 2;
+    private static final int DETAIL_ACTIVITY_CODE = 1;
+
     private static String currentSortState = POPULAR_VALUE;
     private PosterAdapter posterAdapter;
     private RecyclerView recyclerView;
     private boolean hasConnection;
-    private AppDatabase appDatabase;
+    private MainViewModel mainViewModel;
+    private Movie lastVisitedMovie;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        appDatabase=AppDatabase.getInstance(this);
+        mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+
 
         recyclerView = findViewById(R.id.rv_posters);
 
@@ -54,20 +58,31 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Ite
         recyclerView.setAdapter(posterAdapter);
 
         if(savedInstanceState!=null){
-            if(savedInstanceState.containsKey(getString(R.string.movies_key))){
-                posterAdapter.setMoviesData(savedInstanceState.<Movie>getParcelableArrayList(getString(R.string.movies_key)));
-            }
             if(savedInstanceState.containsKey(getString(R.string.current_sort_state))){
                 currentSortState = savedInstanceState.getString(getString(R.string.current_sort_state));
             }
+            if(savedInstanceState.containsKey("lastVisitedMovie")){
+                lastVisitedMovie = savedInstanceState.getParcelable("lastVisitedMovie");
+            }
+            /**
+            if(savedInstanceState.containsKey(getString(R.string.movies_key))){
+                posterAdapter.setMoviesData(savedInstanceState.<Movie>getParcelableArrayList(getString(R.string.movies_key)));
+            }
+
             // if there was no internet, we try again
             if(!hasConnection){
-                populateMovies(currentSortState);
-            }
+                mainViewModel.retrieveMovies(currentSortState);
+            }**/
         }
         else{
-            populateMovies(currentSortState);
+            //mainViewModel.retrieveMovies(currentSortState);
         }
+        mainViewModel.getMovies().observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(List<Movie> movies) {
+                posterAdapter.setMoviesData(new ArrayList<Movie>(movies));
+            }
+        });
     }
 
     @Override
@@ -76,51 +91,11 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Ite
             outState.putParcelableArrayList(getString(R.string.movies_key), posterAdapter.getMovieList());
         }
         outState.putString(getString(R.string.current_sort_state), currentSortState);
+        outState.putParcelable("lastVisitedMovie", lastVisitedMovie);
         super.onSaveInstanceState(outState);
     }
 
-    public void populateMovies(String sort) {
-        PopulateMoviesTask populateMoviesTask = new PopulateMoviesTask();
-        populateMoviesTask.execute(sort);
-    }
 
-    public class PopulateMoviesTask extends AsyncTask<String, Void, List<Movie>> {
-
-        @Override
-        protected List<Movie> doInBackground(String... strings) {
-            List<Movie> listMovies=null;
-            if(strings[0].equals(POPULAR_VALUE)) {
-                String result = NetworkUtils.getPopularMovies();
-                if(result!=null && result.length()!=0) {
-                    listMovies = TheMovieDbJsonUtils.getMoviesFromJson(result);
-                }
-            }
-            else if(strings[0].equals(TOP_VOTE_VALUE)){
-                String result = NetworkUtils.getTopVotedMovies();
-                if(result!=null && result.length()!=0) {
-                    listMovies = TheMovieDbJsonUtils.getMoviesFromJson(result);
-                }
-            }
-            else if(strings[0].equals(FAVOURITE_VALUE)){
-                listMovies = new ArrayList<Movie>(appDatabase.movieDao().loadAllMovies());
-            }
-            return listMovies;
-        }
-
-        @Override
-        protected void onPostExecute(List<Movie> listMovies) {
-            if(listMovies!=null) {
-                posterAdapter.setMoviesData(new ArrayList<Movie>(listMovies));
-                hasConnection = true;
-            }
-            else {
-                Toast.makeText(getApplicationContext(), getString(R.string.no_internet),Toast.LENGTH_LONG).show();
-                hasConnection = false;
-            }
-        }
-
-
-    }
 
     // FOR GRIDLAYOUT ORGANISATION
     public int getGridLayoutColumnCount() {
@@ -165,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Ite
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         if(!parent.getItemAtPosition(position).toString().equals(currentSortState)){
-            populateMovies(parent.getItemAtPosition(position).toString());
+            mainViewModel.retrieveMovies(parent.getItemAtPosition(position).toString());
             currentSortState = parent.getItemAtPosition(position).toString();
         }
     }
@@ -178,8 +153,29 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Ite
     // GO TO DETAIL ACTIVITY
     @Override
     public void onItemClick(Movie clickedMovie) {
+        lastVisitedMovie = clickedMovie;
         Intent intent = new Intent(MainActivity.this, DetailActivity.class);
         intent.putExtra(getString(R.string.movie_object), clickedMovie);
-        startActivity(intent);
+        startActivityForResult(intent, DETAIL_ACTIVITY_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode==RESULT_OK){
+            if(requestCode==DETAIL_ACTIVITY_CODE){
+                if(data!=null){
+                    if(data.getStringExtra("change_favourite_status").equals("true")){
+                        if(lastVisitedMovie.isFavourite()){
+                            mainViewModel.removeMovieFromFavourites(lastVisitedMovie);
+                        }
+                        else{
+                            mainViewModel.addMovieToFavourites(lastVisitedMovie);
+                        }
+                        mainViewModel.retrieveMovies(currentSortState);
+                    }
+                }
+            }
+        }
     }
 }
