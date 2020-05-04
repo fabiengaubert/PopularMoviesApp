@@ -33,6 +33,10 @@ public class MainViewModel extends AndroidViewModel {
         retrieveMovies(POPULAR_VALUE);
     }
 
+    public LiveData<List<Movie>> getMovies(){
+        return mListMovies;
+    }
+
     public void retrieveMovies(String sort) {
         RetrieveMoviesTask retrieveMoviesTask = new RetrieveMoviesTask();
         retrieveMoviesTask.execute(sort);
@@ -75,45 +79,125 @@ public class MainViewModel extends AndroidViewModel {
         protected void onPostExecute(List<Movie> listMovies) {
             if(listMovies!=null) {
                 mListMovies.postValue(listMovies);
+                //retrieveTrailers(listMovies);
             }
         }
     }
 
-    public LiveData<List<Movie>> getMovies(){
-        return mListMovies;
+    public void addMovieToFavourites(Movie movie){
+        AddMovieToFavouritesTask addMovieToFavouritesTask = new AddMovieToFavouritesTask();
+        addMovieToFavouritesTask.execute(movie);
     }
 
-    public void addMovieToFavourites(Movie movie){
-        appDatabase.movieDao().insertMovie(movie);
-        for(int i=0; i<mListMovies.getValue().size(); i++){
-            if(mListMovies.getValue().get(i).equals(movie)) {
-                mListMovies.getValue().get(i).setIsFavourite(true);
-                mListMovies.postValue(mListMovies.getValue());
-                return;
+    public class AddMovieToFavouritesTask extends AsyncTask<Movie, Void, Movie>{
+
+        @Override
+        protected Movie doInBackground(Movie... movies) {
+            appDatabase.movieDao().insertMovie(movies[0]);
+            return movies[0];
+        }
+
+        @Override
+        protected void onPostExecute(Movie movie) {
+            for(int i=0; i<mListMovies.getValue().size(); i++){
+                if(mListMovies.getValue().get(i).equals(movie)) {
+                    mListMovies.getValue().get(i).setIsFavourite(true);
+                    mListMovies.postValue(mListMovies.getValue());
+                    return;
+                }
             }
         }
     }
 
     public void removeMovieFromFavourites(Movie movie){
-        appDatabase.movieDao().deleteMovie(movie);
-        if(lastRequest.equals(FAVOURITE_VALUE)){
-            for(int i=0; i<mListMovies.getValue().size(); i++){
-                if(mListMovies.getValue().get(i).equals(movie)){
-                    mListMovies.getValue().remove(i);
-                    mListMovies.postValue(mListMovies.getValue());
-                    return;
+        RemoveMovieFromFavouritesTask removeMovieFromFavouritesTask = new RemoveMovieFromFavouritesTask();
+        removeMovieFromFavouritesTask.execute(movie);
+    }
+
+    public class RemoveMovieFromFavouritesTask extends AsyncTask<Movie, Void, Movie>{
+
+        @Override
+        protected Movie doInBackground(Movie... movies) {
+            appDatabase.movieDao().deleteMovie(movies[0]);
+            return movies[0];
+        }
+
+        @Override
+        protected void onPostExecute(Movie movie) {
+            if(lastRequest.equals(FAVOURITE_VALUE)){
+                for(int i=0; i<mListMovies.getValue().size(); i++){
+                    if(mListMovies.getValue().get(i).equals(movie)){
+                        mListMovies.getValue().remove(i);
+                        mListMovies.postValue(mListMovies.getValue());
+                        return;
+                    }
                 }
             }
-        }
-        else{
-            for(int i=0; i<mListMovies.getValue().size(); i++){
-                if(mListMovies.getValue().get(i).equals(movie)) {
-                    mListMovies.getValue().get(i).setIsFavourite(false);
-                    mListMovies.postValue(mListMovies.getValue());
-                    return;
+            else{
+                for(int i=0; i<mListMovies.getValue().size(); i++){
+                    if(mListMovies.getValue().get(i).equals(movie)) {
+                        mListMovies.getValue().get(i).setIsFavourite(false);
+                        mListMovies.postValue(mListMovies.getValue());
+                        return;
+                    }
                 }
             }
         }
     }
+
+    public void retrieveTrailers(List<Movie> listMovies){
+        RetrieveTrailersTask retrieveTrailersTask = new RetrieveTrailersTask();
+        retrieveTrailersTask.execute(new ArrayList<Movie>(listMovies));
+    }
+
+    public void retrieveReviews(List<Movie> listMovies){
+        RetrieveReviewsTask retrieveReviewsTask = new RetrieveReviewsTask();
+        retrieveReviewsTask.execute(new ArrayList<Movie>(listMovies));
+    }
+
+    public class RetrieveTrailersTask extends AsyncTask<ArrayList<Movie>, Void, ArrayList<ArrayList<String>>> {
+
+        @Override
+        protected ArrayList<ArrayList<String>> doInBackground(ArrayList<Movie>... movieList) {
+            ArrayList<ArrayList<String>> listTrailersAllMovies = new ArrayList<>();
+            for(Movie movie:movieList[0]){
+                listTrailersAllMovies.add(TheMovieDbJsonUtils.getTrailersFromJson(NetworkUtils.getTrailers(movie.getId())));
+            }
+            return listTrailersAllMovies;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<ArrayList<String>> listTrailersAllMovies) {
+            if(listTrailersAllMovies!=null && listTrailersAllMovies.size()!=0) {
+                for(int i = 0; i<listTrailersAllMovies.size(); i++) {
+                    mListMovies.getValue().get(i).setTrailersPaths(listTrailersAllMovies.get(i));
+                }
+                mListMovies.postValue(mListMovies.getValue());
+            }
+        }
+    }
+
+    public class RetrieveReviewsTask extends AsyncTask<ArrayList<Movie>, Void, ArrayList<ArrayList<Review>>> {
+
+        @Override
+        protected ArrayList<ArrayList<Review>> doInBackground(ArrayList<Movie>... movieList) {
+            ArrayList<ArrayList<Review>> listReviewsAllMovies = new ArrayList<>();
+            for(Movie movie:movieList[0]){
+                listReviewsAllMovies.add(TheMovieDbJsonUtils.getReviewsFromJson(NetworkUtils.getReviews(movie.getId())));
+            }
+            return listReviewsAllMovies;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<ArrayList<Review>> listReviewsAllMovies) {
+            if(listReviewsAllMovies!=null && listReviewsAllMovies.size()!=0) {
+                for(int i = 0; i<listReviewsAllMovies.size(); i++) {
+                    mListMovies.getValue().get(i).setReviews(listReviewsAllMovies.get(i));
+                }
+                mListMovies.postValue(mListMovies.getValue());
+            }
+        }
+    }
+
 
 }

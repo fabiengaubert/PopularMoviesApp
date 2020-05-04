@@ -65,7 +65,7 @@ public final class TheMovieDbJsonUtils {
             for(int i= 0; i<reviews.length(); i++){
                 Review review = new Review();
                 review.setAuthor(reviews.getJSONObject(i).getString(TMDB_REVIEW_AUTHOR));
-                review.setContent(reviews.getJSONObject(i).getString(TMDB_REVIEW_CONTENT));
+                review.setReview(reviews.getJSONObject(i).getString(TMDB_REVIEW_CONTENT));
                 listReviews.add(review);
             }
 

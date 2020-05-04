@@ -1,16 +1,9 @@
 package com.example.popularmoviesapp;
 
 public class Review {
+
     private String mAuthor;
-    private String mContent;
-
-    public Review(){
-
-    }
-    public Review(String author, String content){
-        mAuthor = author;
-        mContent = content;
-    }
+    private String mReview;
 
     public String getAuthor() {
         return mAuthor;
@@ -20,11 +13,11 @@ public class Review {
         this.mAuthor = mAuthor;
     }
 
-    public String getContent() {
-        return mContent;
+    public String getReview() {
+        return mReview;
     }
 
-    public void setContent(String mContent) {
-        this.mContent = mContent;
+    public void setReview(String mReview) {
+        this.mReview = mReview;
     }
 }

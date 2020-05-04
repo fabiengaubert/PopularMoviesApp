@@ -64,8 +64,6 @@ public class DetailActivity extends AppCompatActivity {
                 else{
                     descriptionTextView.setText(mMovie.getOverview());
                 }
-                populateTrailers(mMovie.getId());
-                populateReviews(mMovie.getId());
 
                 final ImageView imageView = findViewById(R.id.ib_star);
                 if(mMovie.isFavourite()){
@@ -117,59 +115,4 @@ public class DetailActivity extends AppCompatActivity {
         setResult(RESULT_OK, intent);
         super.finish();
     }
-
-    public void populateTrailers(int movieId){
-        PopulateTrailersTask populateTrailersTask = new PopulateTrailersTask();
-        populateTrailersTask.execute(movieId);
-    }
-
-    public void populateReviews(int movieId){
-        PopulateReviewsTask populateReviewsTask = new PopulateReviewsTask();
-        populateReviewsTask.execute(movieId);
-    }
-
-    public class PopulateTrailersTask extends AsyncTask<Integer, Void, String> {
-
-        @Override
-        protected String doInBackground(Integer... ints) {
-            return NetworkUtils.getTrailers(ints[0]);
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            if(s!=null && s.length()!=0) {
-                ArrayList<String> listTrailers = TheMovieDbJsonUtils.getTrailersFromJson(s);
-                //TODO update UI
-                //posterAdapter.setMoviesData(listMovies);
-                hasConnection = true;
-            }
-            else {
-                Toast.makeText(getApplicationContext(), getString(R.string.no_internet),Toast.LENGTH_LONG).show();
-                hasConnection = false;
-            }
-        }
-    }
-
-    public class PopulateReviewsTask extends AsyncTask<Integer, Void, String> {
-
-        @Override
-        protected String doInBackground(Integer... ints) {
-            return NetworkUtils.getReviews(ints[0]);
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            if(s!=null && s.length()!=0) {
-                ArrayList<Review> listReviews = TheMovieDbJsonUtils.getReviewsFromJson(s);
-                //TODO update UI
-                //posterAdapter.setMoviesData(listMovies);
-                hasConnection = true;
-            }
-            else {
-                Toast.makeText(getApplicationContext(), getString(R.string.no_internet),Toast.LENGTH_LONG).show();
-                hasConnection = false;
-            }
-        }
-    }
-
 }

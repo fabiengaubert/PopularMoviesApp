@@ -9,6 +9,8 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import java.util.ArrayList;
+
 @Entity(tableName = "movie")
 public class Movie implements Parcelable {
 
@@ -27,6 +29,10 @@ public class Movie implements Parcelable {
     private double mVoteAverage;
     @Ignore
     private boolean mIsFavourite;
+    @Ignore
+    private ArrayList<Review> mReviews;
+    @Ignore
+    private ArrayList<String> mTrailersPaths;
 
     public Movie(int id, String title, String date, String overview, String posterPath, double voteAverage) {
         mId = id;
@@ -109,4 +115,12 @@ public class Movie implements Parcelable {
     public boolean isFavourite() { return mIsFavourite; }
 
     public void setIsFavourite(boolean mIsFavourite) { this.mIsFavourite = mIsFavourite; }
+
+    public ArrayList<Review> getReviews() { return mReviews; }
+
+    public void setReviews(ArrayList<Review> mReviews) { this.mReviews = mReviews; }
+
+    public ArrayList<String> getTrailersPaths() { return mTrailersPaths; }
+
+    public void setTrailersPaths(ArrayList<String> mTrailersPaths) { this.mTrailersPaths = mTrailersPaths; }
 }
