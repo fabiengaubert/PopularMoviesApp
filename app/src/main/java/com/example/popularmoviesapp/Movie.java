@@ -3,6 +3,7 @@ package com.example.popularmoviesapp;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -34,6 +35,13 @@ public class Movie implements Parcelable {
         mOverview = overview;
         mPosterPath = posterPath;
         mVoteAverage = voteAverage;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if(obj==null) return false;
+        if(!(obj instanceof Movie)) return false;
+        return ((Movie)obj).getId()==getId();
     }
 
     protected Movie(Parcel in) {

@@ -22,12 +22,12 @@ public class MainViewModel extends AndroidViewModel {
 
     private MutableLiveData<List<Movie>> mListMovies = new MutableLiveData<>();
     private AppDatabase appDatabase;
-    private boolean hasConnection;
+    private static String lastRequest;
 
     public MainViewModel(@NonNull Application application) {
         super(application);
 
-        mListMovies.setValue(new ArrayList<Movie>());
+        mListMovies.postValue(new ArrayList<Movie>());
 
         appDatabase=AppDatabase.getInstance(getApplication());
         retrieveMovies(POPULAR_VALUE);
@@ -36,6 +36,7 @@ public class MainViewModel extends AndroidViewModel {
     public void retrieveMovies(String sort) {
         RetrieveMoviesTask retrieveMoviesTask = new RetrieveMoviesTask();
         retrieveMoviesTask.execute(sort);
+        lastRequest = sort;
     }
 
     public class RetrieveMoviesTask extends AsyncTask<String, Void, List<Movie>> {
@@ -73,11 +74,7 @@ public class MainViewModel extends AndroidViewModel {
         @Override
         protected void onPostExecute(List<Movie> listMovies) {
             if(listMovies!=null) {
-                mListMovies.setValue(listMovies);
-                hasConnection = true;
-            }
-            else {
-                hasConnection = false;
+                mListMovies.postValue(listMovies);
             }
         }
     }
@@ -88,11 +85,35 @@ public class MainViewModel extends AndroidViewModel {
 
     public void addMovieToFavourites(Movie movie){
         appDatabase.movieDao().insertMovie(movie);
-
+        for(int i=0; i<mListMovies.getValue().size(); i++){
+            if(mListMovies.getValue().get(i).equals(movie)) {
+                mListMovies.getValue().get(i).setIsFavourite(true);
+                mListMovies.postValue(mListMovies.getValue());
+                return;
+            }
+        }
     }
 
     public void removeMovieFromFavourites(Movie movie){
         appDatabase.movieDao().deleteMovie(movie);
+        if(lastRequest.equals(FAVOURITE_VALUE)){
+            for(int i=0; i<mListMovies.getValue().size(); i++){
+                if(mListMovies.getValue().get(i).equals(movie)){
+                    mListMovies.getValue().remove(i);
+                    mListMovies.postValue(mListMovies.getValue());
+                    return;
+                }
+            }
+        }
+        else{
+            for(int i=0; i<mListMovies.getValue().size(); i++){
+                if(mListMovies.getValue().get(i).equals(movie)) {
+                    mListMovies.getValue().get(i).setIsFavourite(false);
+                    mListMovies.postValue(mListMovies.getValue());
+                    return;
+                }
+            }
+        }
     }
 
 }

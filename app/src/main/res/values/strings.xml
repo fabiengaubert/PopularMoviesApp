@@ -3,10 +3,12 @@
     <string name="detail_activity_name">Details Movie</string>
     <string name="movie_poster_description">Poster of the movie</string>
     <string name="no_overview">There is no overview for this movie.</string>
-    <string name="spinner_title">Action bar spinner</string>
-    <string name="movies_key">movies</string>
-    <string name="current_sort_state">currentSortState</string>
+    <string name="spinner_title" translatable="false">Action bar spinner</string>
+    <string name="movies_key" translatable="false">movies</string>
+    <string name="current_sort_state" translatable="false">currentSortState</string>
+    <string name="last_visited_movie" translatable="false">lastVisitedMovie</string>
+    <string name="movie_object" translatable="false">movie_object</string>
+    <string name="null_string" translatable="false">null</string>
+    <string name="change_favourite_status" translatable="false">change_favourite_status</string>
     <string name="no_internet">There is no internet connection.</string>
-    <string name="movie_object">movie_object</string>
-    <string name="null_string">null</string>
 </resources>

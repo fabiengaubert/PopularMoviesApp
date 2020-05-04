@@ -87,9 +87,9 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Ite
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
-        if(!posterAdapter.getMovieList().isEmpty()){
+        /**if(!posterAdapter.getMovieList().isEmpty()){
             outState.putParcelableArrayList(getString(R.string.movies_key), posterAdapter.getMovieList());
-        }
+        }**/
         outState.putString(getString(R.string.current_sort_state), currentSortState);
         outState.putParcelable("lastVisitedMovie", lastVisitedMovie);
         super.onSaveInstanceState(outState);
@@ -165,14 +165,13 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Ite
         if(resultCode==RESULT_OK){
             if(requestCode==DETAIL_ACTIVITY_CODE){
                 if(data!=null){
-                    if(data.getStringExtra("change_favourite_status").equals("true")){
+                    if(data.getStringExtra(getString(R.string.change_favourite_status)).equals("true")){
                         if(lastVisitedMovie.isFavourite()){
                             mainViewModel.removeMovieFromFavourites(lastVisitedMovie);
                         }
                         else{
                             mainViewModel.addMovieToFavourites(lastVisitedMovie);
                         }
-                        mainViewModel.retrieveMovies(currentSortState);
                     }
                 }
             }
