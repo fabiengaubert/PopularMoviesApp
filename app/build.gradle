@@ -35,8 +35,11 @@ dependencies {
 
     implementation 'com.squareup.picasso:picasso:2.71828'
 
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support:recyclerview-v7:27.1.1'
+    //implementation 'com.android.support:appcompat-v7:27.1.1'
+    //implementation 'com.android.support:recyclerview-v7:27.1.1'
+
+    implementation "androidx.appcompat:appcompat:1.1.0"
+    implementation "androidx.recyclerview:recyclerview:1.1.0"
 
     implementation "androidx.room:room-runtime:2.2.5"
     annotationProcessor "androidx.room:room-compiler:2.2.5"
@@ -45,6 +48,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata:2.2.0"
     annotationProcessor "androidx.lifecycle:lifecycle-compiler:2.2.0"
     implementation 'android.arch.lifecycle:extensions:1.1.1'
+    //implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
 }
 
