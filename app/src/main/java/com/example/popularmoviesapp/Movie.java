@@ -15,7 +15,6 @@ import java.util.ArrayList;
 public class Movie implements Parcelable {
 
     @PrimaryKey
-    //TODO should we autogerenate the ID? (autoGenerate = true)
     private int mId;
     @ColumnInfo(name="title")
     private String mTitle;
@@ -43,13 +42,6 @@ public class Movie implements Parcelable {
         mVoteAverage = voteAverage;
     }
 
-    @Override
-    public boolean equals(@Nullable Object obj) {
-        if(obj==null) return false;
-        if(!(obj instanceof Movie)) return false;
-        return ((Movie)obj).getId()==getId();
-    }
-
     protected Movie(Parcel in) {
         mId = in.readInt();
         mTitle = in.readString();
@@ -57,7 +49,9 @@ public class Movie implements Parcelable {
         mOverview = in.readString();
         mPosterPath = in.readString();
         mVoteAverage = in.readDouble();
-        mIsFavourite = in.readBoolean();
+        mIsFavourite = in.readByte() != 0;
+        mReviews = in.createTypedArrayList(Review.CREATOR);
+        mTrailersPaths = in.createStringArrayList();
     }
 
     @Override
@@ -68,12 +62,9 @@ public class Movie implements Parcelable {
         dest.writeString(mOverview);
         dest.writeString(mPosterPath);
         dest.writeDouble(mVoteAverage);
-        dest.writeBoolean(mIsFavourite);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
+        dest.writeByte((byte) (mIsFavourite ? 1 : 0));
+        dest.writeTypedList(mReviews);
+        dest.writeStringList(mTrailersPaths);
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {
@@ -87,6 +78,14 @@ public class Movie implements Parcelable {
             return new Movie[size];
         }
     };
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if(obj==null) return false;
+        if(!(obj instanceof Movie)) return false;
+        return ((Movie)obj).getId()==getId();
+    }
+
 
     public int getId() {
         return mId;
@@ -123,4 +122,9 @@ public class Movie implements Parcelable {
     public ArrayList<String> getTrailersPaths() { return mTrailersPaths; }
 
     public void setTrailersPaths(ArrayList<String> mTrailersPaths) { this.mTrailersPaths = mTrailersPaths; }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 }

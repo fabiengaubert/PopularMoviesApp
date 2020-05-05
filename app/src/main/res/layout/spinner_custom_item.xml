@@ -10,5 +10,4 @@
     android:paddingHorizontal="20dp"
     android:paddingVertical="12dp"
     android:backgroundTint="@color/colorPrimary">
-
 </TextView>

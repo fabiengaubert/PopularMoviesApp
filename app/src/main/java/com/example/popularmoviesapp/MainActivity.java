@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,7 +34,6 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Ite
     private static String currentSortState = POPULAR_VALUE;
     private PosterAdapter posterAdapter;
     private RecyclerView recyclerView;
-    private boolean hasConnection;
     private MainViewModel mainViewModel;
     private Movie lastVisitedMovie;
 
@@ -46,7 +44,6 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Ite
         setContentView(R.layout.activity_main);
 
         mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-
 
         recyclerView = findViewById(R.id.rv_posters);
 
@@ -61,21 +58,9 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Ite
             if(savedInstanceState.containsKey(getString(R.string.current_sort_state))){
                 currentSortState = savedInstanceState.getString(getString(R.string.current_sort_state));
             }
-            if(savedInstanceState.containsKey("lastVisitedMovie")){
-                lastVisitedMovie = savedInstanceState.getParcelable("lastVisitedMovie");
+            if(savedInstanceState.containsKey(getString(R.string.lastVisitedMovie))){
+                lastVisitedMovie = savedInstanceState.getParcelable(getString(R.string.lastVisitedMovie));
             }
-            /**
-            if(savedInstanceState.containsKey(getString(R.string.movies_key))){
-                posterAdapter.setMoviesData(savedInstanceState.<Movie>getParcelableArrayList(getString(R.string.movies_key)));
-            }
-
-            // if there was no internet, we try again
-            if(!hasConnection){
-                mainViewModel.retrieveMovies(currentSortState);
-            }**/
-        }
-        else{
-            //mainViewModel.retrieveMovies(currentSortState);
         }
         mainViewModel.getMovies().observe(this, new Observer<List<Movie>>() {
             @Override
@@ -87,24 +72,19 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Ite
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
-        /**if(!posterAdapter.getMovieList().isEmpty()){
-            outState.putParcelableArrayList(getString(R.string.movies_key), posterAdapter.getMovieList());
-        }**/
         outState.putString(getString(R.string.current_sort_state), currentSortState);
-        outState.putParcelable("lastVisitedMovie", lastVisitedMovie);
+        outState.putParcelable(getString(R.string.lastVisitedMovie), lastVisitedMovie);
         super.onSaveInstanceState(outState);
     }
 
-
-
     // FOR GRIDLAYOUT ORGANISATION
-    public int getGridLayoutColumnCount() {
+    private int getGridLayoutColumnCount() {
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         float screenWidth = displayMetrics.widthPixels;
         return Math.round(screenWidth / RECOMMENDED_IMAGE_SIZE);
     }
 
-    public int getPosterWidth(){
+    private int getPosterWidth(){
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         float screenWidth = displayMetrics.widthPixels;
         return Math.round(screenWidth / getGridLayoutColumnCount());

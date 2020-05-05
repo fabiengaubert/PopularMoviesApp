@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 public final class NetworkUtils {
     private static final String KEY_PARAM = "api_key";
-    //TODO the key needs to be changed here or in added to the gradle.config
+    //TODO the key needs to be changed here or added to the gradle.config
     private static final String KEY_VALUE = BuildConfig.TMDB_API_KEY;
     private static final String BASE_URL_MOVIE_DB = "http://api.themoviedb.org/3/movie";
     private static final String BASE_URL_IMAGE = "http://image.tmdb.org/t/p/w185";
@@ -20,6 +20,8 @@ public final class NetworkUtils {
     private static final String TOP_RATED = "/top_rated";
     private static final String TRAILERS = "/videos";
     private static final String REVIEWS = "/reviews";
+    private static final String BASE_URL_TRAILER = "http://www.youtube.com/watch";
+    private static final String TRAILER_QUERY_KEY = "v";
 
 
     public static String getPopularMovies(){
@@ -46,6 +48,12 @@ public final class NetworkUtils {
         return Uri.parse(BASE_URL_IMAGE+posterPath);
     }
 
+    public static Uri getTrailerUri(String trailerPath){
+        Uri.Builder builder = Uri.parse(BASE_URL_TRAILER).buildUpon();
+        builder.appendQueryParameter(TRAILER_QUERY_KEY, trailerPath);
+        return builder.build();
+    }
+
     public static String getTrailers(int movieId){
         URL url = null;
         Uri.Builder builder = Uri.parse(BASE_URL_MOVIE_DB+"/"+movieId+TRAILERS).buildUpon();
@@ -70,7 +78,7 @@ public final class NetworkUtils {
         return getResponseFromHttpUrl(url);
     }
 
-    public static String getResponseFromHttpUrl(URL url){
+    private static String getResponseFromHttpUrl(URL url){
         String result = "";
         HttpURLConnection httpURLConnection = null;
         try {

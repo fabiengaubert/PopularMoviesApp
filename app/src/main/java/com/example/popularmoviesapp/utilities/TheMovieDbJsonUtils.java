@@ -50,7 +50,6 @@ public final class TheMovieDbJsonUtils {
             for(int i= 0; i<trailers.length(); i++){
                 listTrailers.add(trailers.getJSONObject(i).getString(TMDB_TRAILER_KEY));
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -68,7 +67,6 @@ public final class TheMovieDbJsonUtils {
                 review.setReview(reviews.getJSONObject(i).getString(TMDB_REVIEW_CONTENT));
                 listReviews.add(review);
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }

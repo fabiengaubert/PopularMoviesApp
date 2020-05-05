@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:background="@color/colorPrimaryDark">
     <LinearLayout
+        android:id="@+id/ly_detail"
         android:orientation="vertical" android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <FrameLayout
@@ -54,6 +55,6 @@
             android:textSize="20sp"
             android:paddingHorizontal="16dp"
             android:paddingTop="8dp"
-            android:paddingBottom="16dp"/>
+            android:paddingBottom="24dp"/>
     </LinearLayout>
 </ScrollView>

@@ -2,7 +2,6 @@ package com.example.popularmoviesapp;
 
 import android.app.Application;
 import android.os.AsyncTask;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -43,7 +42,7 @@ public class MainViewModel extends AndroidViewModel {
         lastRequest = sort;
     }
 
-    public class RetrieveMoviesTask extends AsyncTask<String, Void, List<Movie>> {
+    class RetrieveMoviesTask extends AsyncTask<String, Void, List<Movie>> {
 
         @Override
         protected List<Movie> doInBackground(String... strings) {
@@ -79,7 +78,10 @@ public class MainViewModel extends AndroidViewModel {
         protected void onPostExecute(List<Movie> listMovies) {
             if(listMovies!=null) {
                 mListMovies.postValue(listMovies);
-                //retrieveTrailers(listMovies);
+                //we know that AsyncTasks are executed on a single thread, in serial
+                //so this should not create problem, even if both tasks work with the same data
+                retrieveTrailers(listMovies);
+                retrieveReviews(listMovies);
             }
         }
     }
@@ -89,7 +91,7 @@ public class MainViewModel extends AndroidViewModel {
         addMovieToFavouritesTask.execute(movie);
     }
 
-    public class AddMovieToFavouritesTask extends AsyncTask<Movie, Void, Movie>{
+    class AddMovieToFavouritesTask extends AsyncTask<Movie, Void, Movie>{
 
         @Override
         protected Movie doInBackground(Movie... movies) {
@@ -114,7 +116,7 @@ public class MainViewModel extends AndroidViewModel {
         removeMovieFromFavouritesTask.execute(movie);
     }
 
-    public class RemoveMovieFromFavouritesTask extends AsyncTask<Movie, Void, Movie>{
+    class RemoveMovieFromFavouritesTask extends AsyncTask<Movie, Void, Movie>{
 
         @Override
         protected Movie doInBackground(Movie... movies) {
@@ -145,17 +147,12 @@ public class MainViewModel extends AndroidViewModel {
         }
     }
 
-    public void retrieveTrailers(List<Movie> listMovies){
+    private void retrieveTrailers(List<Movie> listMovies){
         RetrieveTrailersTask retrieveTrailersTask = new RetrieveTrailersTask();
         retrieveTrailersTask.execute(new ArrayList<Movie>(listMovies));
     }
 
-    public void retrieveReviews(List<Movie> listMovies){
-        RetrieveReviewsTask retrieveReviewsTask = new RetrieveReviewsTask();
-        retrieveReviewsTask.execute(new ArrayList<Movie>(listMovies));
-    }
-
-    public class RetrieveTrailersTask extends AsyncTask<ArrayList<Movie>, Void, ArrayList<ArrayList<String>>> {
+    class RetrieveTrailersTask extends AsyncTask<ArrayList<Movie>, Void, ArrayList<ArrayList<String>>> {
 
         @Override
         protected ArrayList<ArrayList<String>> doInBackground(ArrayList<Movie>... movieList) {
@@ -177,7 +174,12 @@ public class MainViewModel extends AndroidViewModel {
         }
     }
 
-    public class RetrieveReviewsTask extends AsyncTask<ArrayList<Movie>, Void, ArrayList<ArrayList<Review>>> {
+    private void retrieveReviews(List<Movie> listMovies) {
+        RetrieveReviewsTask retrieveReviewsTask = new RetrieveReviewsTask();
+        retrieveReviewsTask.execute(new ArrayList<Movie>(listMovies));
+    }
+
+    class RetrieveReviewsTask extends AsyncTask<ArrayList<Movie>, Void, ArrayList<ArrayList<Review>>> {
 
         @Override
         protected ArrayList<ArrayList<Review>> doInBackground(ArrayList<Movie>... movieList) {
@@ -198,6 +200,4 @@ public class MainViewModel extends AndroidViewModel {
             }
         }
     }
-
-
 }

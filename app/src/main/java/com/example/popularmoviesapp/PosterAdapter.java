@@ -26,7 +26,7 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
 
     class PosterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         ImageView imageView;
-        public PosterViewHolder(@NonNull View itemView) {
+        PosterViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.rv_posters_item);
             itemView.setOnClickListener(this);
@@ -55,7 +55,6 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
 
     @Override
     public void onBindViewHolder(@NonNull PosterAdapter.PosterViewHolder holder, int position) {
-        // if there is no image we still need to set the size of the ImageView
         if(mMovies.get(position).getPosterPath().equals("null")){
             Picasso.get()
                     .load(R.drawable.poster_not_available)
@@ -82,17 +81,4 @@ public class PosterAdapter extends RecyclerView.Adapter<PosterAdapter.PosterView
         mMovies = newMoviesList;
         notifyDataSetChanged();
     }
-
-    public Movie getMovie(int position){
-        return mMovies.get(position);
-    }
-
-    public ArrayList<Movie> getMovieList(){
-        return mMovies;
-    }
-
-    public void setImageWidth(int imageWidth) {
-        mImageWidth = imageWidth;
-    }
-
 }
