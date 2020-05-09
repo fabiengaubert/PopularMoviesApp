@@ -14,4 +14,5 @@
     <string name="reviews_label">Reviews</string>
     <string name="no_review">No review available.</string>
     <string name="lastVisitedMovie">lastVisitedMovie</string>
+    <string name="no_internet">There is no internet connection</string>
 </resources>

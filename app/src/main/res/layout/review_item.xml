@@ -7,17 +7,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
-        android:textSize="16sp"
+        android:textSize="@dimen/text_size_review_title"
         android:textStyle="bold"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="8dp"/>
+        android:paddingHorizontal="@dimen/padding_horizontal_review_title"
+        android:paddingTop="@dimen/padding_top_review_title"/>
     <TextView
         android:id="@+id/tv_review"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
-        android:textSize="16sp"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="4dp"
-        android:paddingBottom="24dp"/>
+        android:textSize="@dimen/text_size_review"
+        android:paddingHorizontal="@dimen/padding_horizontal_review"
+        android:paddingTop="@dimen/padding_top_review"
+        android:paddingBottom="@dimen/padding_bottoml_review"/>
 </LinearLayout>

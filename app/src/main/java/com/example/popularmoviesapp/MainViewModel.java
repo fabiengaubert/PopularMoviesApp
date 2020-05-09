@@ -2,6 +2,7 @@ package com.example.popularmoviesapp;
 
 import android.app.Application;
 import android.os.AsyncTask;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -20,6 +21,7 @@ public class MainViewModel extends AndroidViewModel {
     private static final String FAVOURITE_VALUE = "Favourite";
 
     private MutableLiveData<List<Movie>> mListMovies = new MutableLiveData<>();
+    private LiveData<List<Movie>> mListFavouriteMovies;
     private AppDatabase appDatabase;
     private static String lastRequest;
 
@@ -29,11 +31,15 @@ public class MainViewModel extends AndroidViewModel {
         mListMovies.postValue(new ArrayList<Movie>());
 
         appDatabase=AppDatabase.getInstance(getApplication());
+        mListFavouriteMovies=appDatabase.movieDao().loadAllMovies();
         retrieveMovies(POPULAR_VALUE);
     }
 
     public LiveData<List<Movie>> getMovies(){
         return mListMovies;
+    }
+    public LiveData<List<Movie>> getFavouriteMovies(){
+        return mListFavouriteMovies;
     }
 
     public void retrieveMovies(String sort) {
@@ -48,27 +54,37 @@ public class MainViewModel extends AndroidViewModel {
         protected List<Movie> doInBackground(String... strings) {
             List<Movie> listMovies=null;
             if(strings[0].equals(POPULAR_VALUE)) {
-                String result = NetworkUtils.getPopularMovies();
-                if(result!=null && result.length()!=0) {
-                    listMovies = TheMovieDbJsonUtils.getMoviesFromJson(result);
-                    for(Movie movie: listMovies){
-                        movie.setIsFavourite(appDatabase.movieDao().getMovie(movie.getId())!=null);
+                if(NetworkUtils.isConnectedToInternet(getApplication())) {
+                    String result = NetworkUtils.getPopularMovies();
+                    if (result != null && result.length() != 0) {
+                        listMovies = TheMovieDbJsonUtils.getMoviesFromJson(result);
+                        for (Movie movie : listMovies) {
+                            //movie.setIsFavourite(appDatabase.movieDao().getMovie(movie.getId())!=null);
+                            //keeping an updated list of favourite movies in a LiveData object
+                            //avoids to query the database unnecessarily
+                            movie.setIsFavourite(mListFavouriteMovies.getValue().contains(movie));
+                        }
                     }
                 }
             }
             else if(strings[0].equals(TOP_VOTE_VALUE)){
-                String result = NetworkUtils.getTopVotedMovies();
-                if(result!=null && result.length()!=0) {
-                    listMovies = TheMovieDbJsonUtils.getMoviesFromJson(result);
-                    for(Movie movie: listMovies){
-                        movie.setIsFavourite(appDatabase.movieDao().getMovie(movie.getId())!=null);
+                if(NetworkUtils.isConnectedToInternet(getApplication())) {
+                    String result = NetworkUtils.getTopVotedMovies();
+                    if (result != null && result.length() != 0) {
+                        listMovies = TheMovieDbJsonUtils.getMoviesFromJson(result);
+                        for (Movie movie : listMovies) {
+                            //movie.setIsFavourite(appDatabase.movieDao().getMovie(movie.getId())!=null);
+                            movie.setIsFavourite(mListFavouriteMovies.getValue().contains(movie));
+                        }
                     }
                 }
             }
             else if(strings[0].equals(FAVOURITE_VALUE)){
-                listMovies = new ArrayList<Movie>(appDatabase.movieDao().loadAllMovies());
-                for(Movie movie: listMovies){
-                    movie.setIsFavourite(true);
+                listMovies = mListFavouriteMovies.getValue();
+                if(listMovies!=null){
+                    for(Movie movie: listMovies){
+                        movie.setIsFavourite(true);
+                    }
                 }
             }
             return listMovies;
@@ -80,8 +96,10 @@ public class MainViewModel extends AndroidViewModel {
                 mListMovies.postValue(listMovies);
                 //we know that AsyncTasks are executed on a single thread, in serial
                 //so this should not create problem, even if both tasks work with the same data
-                retrieveTrailers(listMovies);
-                retrieveReviews(listMovies);
+                if(NetworkUtils.isConnectedToInternet(getApplication())) {
+                    retrieveTrailers(listMovies);
+                    retrieveReviews(listMovies);
+                }
             }
         }
     }

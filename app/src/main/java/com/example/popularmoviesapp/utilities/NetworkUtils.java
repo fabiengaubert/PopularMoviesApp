@@ -1,6 +1,13 @@
 package com.example.popularmoviesapp.utilities;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
+import android.util.Log;
 
 import com.example.popularmoviesapp.BuildConfig;
 
@@ -23,8 +30,14 @@ public final class NetworkUtils {
     private static final String BASE_URL_TRAILER = "http://www.youtube.com/watch";
     private static final String TRAILER_QUERY_KEY = "v";
 
+    public static Boolean isConnectedToInternet(Context context) {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return (netInfo != null && netInfo.isConnectedOrConnecting());
+    }
 
-    public static String getPopularMovies(){
+        public static String getPopularMovies(){
         return getMovies(POPULAR_MOVIES);
     }
 

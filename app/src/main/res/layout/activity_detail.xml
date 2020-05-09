@@ -15,33 +15,33 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:scaleType="fitStart"
-                android:paddingHorizontal="36dp"
-                android:paddingVertical="20dp"
+                android:paddingHorizontal="@dimen/padding_horizontal_thumbnail"
+                android:paddingVertical="@dimen/padding_vertical_thumbnail"
                 android:contentDescription="@string/movie_poster_description" />
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingLeft="208dp"
-                android:paddingTop="28dp">
+                android:paddingLeft="@dimen/padding_left_detail_layout"
+                android:paddingTop="@dimen/padding_top_detail_layout">
                 <TextView
                     android:id="@+id/tv_vote"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="32sp"
+                    android:textSize="@dimen/text_size_vote"
                     android:textColor="@color/white"/>
                 <TextView
                     android:id="@+id/tv_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/text_size_date"
                     android:textColor="@color/white"/>
                 <ImageButton
                     android:id="@+id/ib_star"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="@dimen/margin_top_star_button"
+                    android:layout_marginLeft="@dimen/margin_left_star_button"
                     android:tint="@android:color/white"
                     android:background="@android:color/transparent"
                     android:src="@drawable/baseline_stars_24"/>
@@ -52,9 +52,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
-            android:textSize="20sp"
-            android:paddingHorizontal="16dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="24dp"/>
+            android:textSize="@dimen/text_size_description_movie"
+            android:paddingHorizontal="@dimen/padding_horizontal_description_movie"
+            android:paddingTop="@dimen/padding_top_description_movie"
+            android:paddingBottom="@dimen/padding_bottom_description_movie"/>
     </LinearLayout>
 </ScrollView>

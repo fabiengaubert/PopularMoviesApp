@@ -6,11 +6,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
-        android:textSize="16sp"
+        android:textSize="@dimen/text_size_trailer_title"
         android:textStyle="bold"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="16dp"
-        android:paddingBottom="24dp"/>
+        android:paddingHorizontal="@dimen/padding_horizontal_trailer_title"
+        android:paddingTop="@dimen/padding_top_trailer_title"
+        android:paddingBottom="@dimen/padding_bottom_trailer_title"/>
     <ImageButton
         android:id="@+id/ib_play"
         android:layout_width="wrap_content"

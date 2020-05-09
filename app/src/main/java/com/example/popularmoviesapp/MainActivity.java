@@ -68,6 +68,18 @@ public class MainActivity extends AppCompatActivity implements PosterAdapter.Ite
                 posterAdapter.setMoviesData(new ArrayList<Movie>(movies));
             }
         });
+        mainViewModel.getFavouriteMovies().observe(this, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(List<Movie> movies) {
+                // if the database changed and we are in favourite mode, we pass the new data to the adapter
+                if(currentSortState.equals(FAVOURITE_VALUE)){
+                    for(Movie movie:movies){
+                        movie.setIsFavourite(true);
+                    }
+                    posterAdapter.setMoviesData(new ArrayList<Movie>(movies));
+                }
+            }
+        });
     }
 
     @Override

@@ -5,4 +5,5 @@
     <color name="colorAccent">#000000</color>
     <color name="white">#FFFFFF</color>
     <color name="yellow">#ffb400</color>
+    <color name="color_background_poster_item">#000000</color>
 </resources>

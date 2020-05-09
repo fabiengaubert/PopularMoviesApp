@@ -1,5 +1,6 @@
 package com.example.popularmoviesapp;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -13,7 +14,7 @@ import java.util.List;
 public interface MovieDao {
 
     @Query("SELECT * FROM movie")
-    List<Movie> loadAllMovies();
+    LiveData<List<Movie>> loadAllMovies();
 
     @Query("SELECT * FROM movie WHERE mId = :id")
     Movie getMovie(int id);
